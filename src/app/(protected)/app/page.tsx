@@ -33,7 +33,7 @@ export default async function AppPage() {
             {animalList.length} {animalList.length === 1 ? 'animal' : 'animals'} in your collection
           </p>
         </div>
-        <AddAnimalDialogWrapper userId={user.id} />
+        <AddAnimalDialogWrapper userId={user.id} email={user.email || ''} />
       </div>
 
       {animalList.length === 0 ? (
@@ -41,7 +41,7 @@ export default async function AppPage() {
           <p className="text-muted-foreground mb-4">
             You haven't added any animals yet.
           </p>
-          <AddAnimalDialogWrapper userId={user.id} />
+          <AddAnimalDialogWrapper userId={user.id} email={user.email || ''} />
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

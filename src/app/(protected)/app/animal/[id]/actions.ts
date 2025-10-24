@@ -6,12 +6,12 @@ import { validateEventDetails } from '@/lib/validators'
 import type { Event, EventType } from '@/lib/types'
 
 interface ActionResult {
-  success: boolean
+  ok?: true
   error?: string
 }
 
 interface EventsResult {
-  success: boolean
+  ok?: true
   data?: Event[]
   error?: string
 }
@@ -32,14 +32,12 @@ export async function listEvents(
 
     if (!animal) {
       return {
-        success: false,
         error: 'Animal not found',
       }
     }
 
     if (animal.user_id !== userId) {
       return {
-        success: false,
         error: 'You do not have permission to view this animal',
       }
     }
@@ -53,24 +51,21 @@ export async function listEvents(
 
     if (error) {
       return {
-        success: false,
         error: error.message,
       }
     }
 
     return {
-      success: true,
+      ok: true,
       data: (events || []) as Event[],
     }
   } catch (error) {
     if (error instanceof Error) {
       return {
-        success: false,
         error: error.message,
       }
     }
     return {
-      success: false,
       error: 'An unexpected error occurred',
     }
   }
@@ -101,14 +96,12 @@ export async function createEvent(
 
     if (!animal) {
       return {
-        success: false,
         error: 'Animal not found',
       }
     }
 
     if (animal.user_id !== userId) {
       return {
-        success: false,
         error: 'You do not have permission to log events for this animal',
       }
     }
@@ -121,12 +114,10 @@ export async function createEvent(
       } catch (error) {
         if (error instanceof Error) {
           return {
-            success: false,
             error: error.message,
           }
         }
         return {
-          success: false,
           error: 'Invalid event details',
         }
       }
@@ -145,7 +136,6 @@ export async function createEvent(
 
     if (insertError) {
       return {
-        success: false,
         error: insertError.message,
       }
     }
@@ -153,16 +143,14 @@ export async function createEvent(
     // Revalidate the animal detail page
     revalidatePath(`/app/animal/${animalId}`)
 
-    return { success: true }
+    return { ok: true }
   } catch (error) {
     if (error instanceof Error) {
       return {
-        success: false,
         error: error.message,
       }
     }
     return {
-      success: false,
       error: 'An unexpected error occurred',
     }
   }

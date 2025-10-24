@@ -1,34 +1,51 @@
-'use client'
-
-import { useState } from 'react'
 import { Crown, Mail, Calendar, CreditCard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { UpgradeDialog } from '@/components/UpgradeDialog'
+import { Progress } from '@/components/ui/progress'
 import { SignOutButton } from '@/components/SignOutButton'
+import { UpgradeButton } from '@/components/UpgradeButton'
+import { createClient } from '@/lib/supabaseServer'
 import { fmtDate } from '@/lib/format'
 import type { PlanStatus } from '@/lib/types'
 
-export default function AccountPage() {
-  const [upgradeOpen, setUpgradeOpen] = useState(false)
+export default async function AccountPage() {
+  const supabase = await createClient()
 
-  // Stub: would fetch user and subscription data from Supabase
-  const user = {
-    email: 'user@example.com',
-    created_at: '2024-01-01T00:00:00Z',
+  // Get current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return null // Layout will redirect
   }
 
-  const subscription: {
+  // Fetch subscription data
+  const { data: subscription } = await supabase
+    .from('subscriptions')
+    .select('*')
+    .eq('user_id', user.id)
+    .single()
+
+  const subscriptionData: {
     status: PlanStatus
     stripe_customer_id?: string
     stripe_subscription_id?: string
-  } = {
-    status: 'none',
-  }
+  } = subscription || { status: 'none' }
 
-  const isPro = subscription.status === 'active'
-  const isPastDue = subscription.status === 'past_due'
+  const isPro = subscriptionData.status === 'active'
+  const isPastDue = subscriptionData.status === 'past_due'
+
+  // Fetch animal count for usage meter
+  const { count: animalCount } = await supabase
+    .from('animals')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+
+  const totalAnimals = animalCount || 0
+  const freeLimit = 5
+  const usagePercent = Math.min((totalAnimals / freeLimit) * 100, 100)
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -88,9 +105,9 @@ export default function AccountPage() {
                 isPro ? 'default' : isPastDue ? 'destructive' : 'secondary'
               }
             >
-              {subscription.status === 'none'
+              {subscriptionData.status === 'none'
                 ? 'Free'
-                : subscription.status.replace('_', ' ').toUpperCase()}
+                : subscriptionData.status.replace('_', ' ').toUpperCase()}
             </Badge>
           </div>
         </CardHeader>
@@ -124,23 +141,36 @@ export default function AccountPage() {
             </>
           ) : (
             <>
-              <div className="space-y-2">
-                <p className="text-sm">
-                  Unlock advanced features with Breeding Pro:
-                </p>
-                <ul className="text-sm text-muted-foreground space-y-1 ml-4">
-                  <li>• Unlimited animals</li>
-                  <li>• Breeding tracking & genetics</li>
-                  <li>• Advanced analytics</li>
-                  <li>• Export data</li>
-                  <li>• Priority support</li>
-                </ul>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="font-medium">Free Plan</span>
+                    <span className="text-muted-foreground">
+                      {totalAnimals} of {freeLimit} animals used
+                    </span>
+                  </div>
+                  <Progress value={usagePercent} className="h-2" />
+                  {totalAnimals >= freeLimit && (
+                    <p className="text-xs text-destructive mt-2">
+                      You've reached the free tier limit. Upgrade to add more animals.
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">
+                    Unlock advanced features with Breeding Pro:
+                  </p>
+                  <ul className="text-sm text-muted-foreground space-y-1 ml-4">
+                    <li>• Unlimited animals</li>
+                    <li>• Breeding tracking & genetics</li>
+                    <li>• Advanced analytics</li>
+                    <li>• Export data</li>
+                    <li>• Priority support</li>
+                  </ul>
+                </div>
               </div>
               <div className="pt-4 border-t">
-                <Button onClick={() => setUpgradeOpen(true)}>
-                  <Crown className="h-4 w-4 mr-2" />
-                  Upgrade to Pro
-                </Button>
+                <UpgradeButton userId={user.id} email={user.email || ''} />
               </div>
             </>
           )}
@@ -159,12 +189,6 @@ export default function AccountPage() {
           </Button>
         </CardContent>
       </Card>
-
-      <UpgradeDialog
-        open={upgradeOpen}
-        onOpenChange={setUpgradeOpen}
-        onUpgrade={() => console.log('Upgrade clicked')}
-      />
     </div>
   )
 }

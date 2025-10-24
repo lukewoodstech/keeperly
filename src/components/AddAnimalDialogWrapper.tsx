@@ -7,9 +7,10 @@ import { createAnimal } from '@/app/(protected)/app/actions'
 
 interface AddAnimalDialogWrapperProps {
   userId: string
+  email: string
 }
 
-export function AddAnimalDialogWrapper({ userId }: AddAnimalDialogWrapperProps) {
+export function AddAnimalDialogWrapper({ userId, email }: AddAnimalDialogWrapperProps) {
   const [upgradeOpen, setUpgradeOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -18,7 +19,7 @@ export function AddAnimalDialogWrapper({ userId }: AddAnimalDialogWrapperProps) 
 
     const result = await createAnimal(data, userId)
 
-    if (!result.success) {
+    if (!result.ok) {
       if (result.requiresUpgrade) {
         setUpgradeOpen(true)
       } else {
@@ -36,10 +37,8 @@ export function AddAnimalDialogWrapper({ userId }: AddAnimalDialogWrapperProps) 
       <UpgradeDialog
         open={upgradeOpen}
         onOpenChange={setUpgradeOpen}
-        onUpgrade={() => {
-          // TODO: Implement Stripe checkout
-          console.log('Upgrade clicked')
-        }}
+        userId={userId}
+        email={email}
       />
     </>
   )

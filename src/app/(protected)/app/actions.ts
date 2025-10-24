@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabaseServer'
 import { animalSchema } from '@/lib/validators'
 
 interface ActionResult {
-  success: boolean
+  ok?: true
   error?: string
   requiresUpgrade?: boolean
 }
@@ -35,7 +35,6 @@ export async function createAnimal(
 
       if (count !== null && count >= 5) {
         return {
-          success: false,
           error: 'You have reached the limit of 5 animals on the free plan',
           requiresUpgrade: true,
         }
@@ -53,7 +52,6 @@ export async function createAnimal(
 
     if (insertError) {
       return {
-        success: false,
         error: insertError.message,
       }
     }
@@ -61,16 +59,14 @@ export async function createAnimal(
     // Revalidate the animals page
     revalidatePath('/app')
 
-    return { success: true }
+    return { ok: true }
   } catch (error) {
     if (error instanceof Error) {
       return {
-        success: false,
         error: error.message,
       }
     }
     return {
-      success: false,
       error: 'An unexpected error occurred',
     }
   }
@@ -92,14 +88,12 @@ export async function deleteAnimal(
 
     if (!animal) {
       return {
-        success: false,
         error: 'Animal not found',
       }
     }
 
     if (animal.user_id !== userId) {
       return {
-        success: false,
         error: 'You do not have permission to delete this animal',
       }
     }
@@ -112,7 +106,6 @@ export async function deleteAnimal(
 
     if (deleteError) {
       return {
-        success: false,
         error: deleteError.message,
       }
     }
@@ -120,16 +113,14 @@ export async function deleteAnimal(
     // Revalidate the animals page
     revalidatePath('/app')
 
-    return { success: true }
+    return { ok: true }
   } catch (error) {
     if (error instanceof Error) {
       return {
-        success: false,
         error: error.message,
       }
     }
     return {
-      success: false,
       error: 'An unexpected error occurred',
     }
   }
