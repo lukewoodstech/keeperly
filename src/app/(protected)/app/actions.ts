@@ -1,0 +1,136 @@
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { createClient } from '@/lib/supabaseServer'
+import { animalSchema } from '@/lib/validators'
+
+interface ActionResult {
+  success: boolean
+  error?: string
+  requiresUpgrade?: boolean
+}
+
+export async function createAnimal(
+  formData: unknown,
+  userId: string
+): Promise<ActionResult> {
+  try {
+    const supabase = await createClient()
+
+    // Check subscription status
+    const { data: subscription } = await supabase
+      .from('subscriptions')
+      .select('status')
+      .eq('user_id', userId)
+      .single()
+
+    const isPro = subscription?.status === 'active'
+
+    // If not pro, check animal count limit (5 animals max for free tier)
+    if (!isPro) {
+      const { count } = await supabase
+        .from('animals')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+
+      if (count !== null && count >= 5) {
+        return {
+          success: false,
+          error: 'You have reached the limit of 5 animals on the free plan',
+          requiresUpgrade: true,
+        }
+      }
+    }
+
+    // Validate form data
+    const validatedData = animalSchema.parse(formData)
+
+    // Insert animal
+    const { error: insertError } = await supabase.from('animals').insert({
+      user_id: userId,
+      ...validatedData,
+    })
+
+    if (insertError) {
+      return {
+        success: false,
+        error: insertError.message,
+      }
+    }
+
+    // Revalidate the animals page
+    revalidatePath('/app')
+
+    return { success: true }
+  } catch (error) {
+    if (error instanceof Error) {
+      return {
+        success: false,
+        error: error.message,
+      }
+    }
+    return {
+      success: false,
+      error: 'An unexpected error occurred',
+    }
+  }
+}
+
+export async function deleteAnimal(
+  animalId: string,
+  userId: string
+): Promise<ActionResult> {
+  try {
+    const supabase = await createClient()
+
+    // Verify ownership
+    const { data: animal } = await supabase
+      .from('animals')
+      .select('user_id')
+      .eq('id', animalId)
+      .single()
+
+    if (!animal) {
+      return {
+        success: false,
+        error: 'Animal not found',
+      }
+    }
+
+    if (animal.user_id !== userId) {
+      return {
+        success: false,
+        error: 'You do not have permission to delete this animal',
+      }
+    }
+
+    // Delete animal (events will be cascade deleted by database)
+    const { error: deleteError } = await supabase
+      .from('animals')
+      .delete()
+      .eq('id', animalId)
+
+    if (deleteError) {
+      return {
+        success: false,
+        error: deleteError.message,
+      }
+    }
+
+    // Revalidate the animals page
+    revalidatePath('/app')
+
+    return { success: true }
+  } catch (error) {
+    if (error instanceof Error) {
+      return {
+        success: false,
+        error: error.message,
+      }
+    }
+    return {
+      success: false,
+      error: 'An unexpected error occurred',
+    }
+  }
+}
