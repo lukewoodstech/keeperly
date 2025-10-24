@@ -74,10 +74,40 @@ export async function POST(request: Request) {
     // Handle customer.subscription.* events
     if (event.type.startsWith('customer.subscription.')) {
       const subscription = event.data.object as Stripe.Subscription
-      const userId = subscription.metadata?.userId
+
+      // Try to get userId from subscription metadata first
+      let userId = subscription.metadata?.userId
+
+      // If not in subscription metadata, fetch customer and check there
+      if (!userId) {
+        try {
+          const customer = await stripe.customers.retrieve(
+            subscription.customer as string
+          ) as Stripe.Customer
+
+          userId = customer.metadata?.userId
+
+          if (!userId) {
+            // As last resort, try to find user by email
+            if (!customer.deleted && customer.email) {
+              const { data: user } = await supabaseAdmin
+                .from('auth.users')
+                .select('id')
+                .eq('email', customer.email)
+                .single()
+
+              if (user) {
+                userId = user.id
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching customer:', error)
+        }
+      }
 
       if (!userId) {
-        console.error('No userId in subscription metadata')
+        console.error('Could not determine userId for subscription')
         return NextResponse.json({ received: true })
       }
 
