@@ -23,7 +23,7 @@ export function QuickLogDialogWrapper({ animalId, userId }: QuickLogDialogWrappe
       details: data.details,
     })
 
-    if (!result.success) {
+    if (!result.ok) {
       setError(result.error || 'Failed to create event')
       // Could show toast notification here
       console.error('Error creating event:', result.error)

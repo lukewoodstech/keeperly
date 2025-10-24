@@ -6,7 +6,7 @@ import { createClient } from '@supabase/supabase-js'
 export const runtime = 'nodejs'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2025-09-30.clover',
 })
 
 // Service role client for admin operations
@@ -121,10 +121,10 @@ export async function POST(request: Request) {
           stripe_subscription_id: subscription.id,
           status,
           current_period_start: new Date(
-            subscription.current_period_start * 1000
+            (subscription as any).current_period_start * 1000
           ).toISOString(),
           current_period_end: new Date(
-            subscription.current_period_end * 1000
+            (subscription as any).current_period_end * 1000
           ).toISOString(),
           updated_at: new Date().toISOString(),
         },
