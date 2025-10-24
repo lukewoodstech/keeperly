@@ -19,12 +19,12 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
   const { id } = await params
   const supabase = await createClient()
 
-  // Get current user session
+  // Get current user - use getUser() for security
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session) {
+  if (!user) {
     return null // Layout will redirect
   }
 
@@ -33,7 +33,7 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
     .from('animals')
     .select('*')
     .eq('id', id)
-    .eq('user_id', session.user.id)
+    .eq('user_id', user.id)
     .single()
 
   if (!animal) {
@@ -73,7 +73,7 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
           </div>
 
           <div className="flex gap-2">
-            <QuickLogDialogWrapper animalId={animal.id} userId={session.user.id} />
+            <QuickLogDialogWrapper animalId={animal.id} userId={user.id} />
             <Button variant="outline" size="icon">
               <Edit className="h-4 w-4" />
             </Button>

@@ -29,12 +29,14 @@ const SheetTrigger = ({ children, asChild }: { children: React.ReactNode; asChil
   if (!context) throw new Error('SheetTrigger must be used within Sheet')
 
   const child = React.Children.only(children) as React.ReactElement<{ onClick?: (e: React.MouseEvent) => void }>
+  const originalOnClick = child.props.onClick
+
   return React.cloneElement(child, {
     onClick: (e: React.MouseEvent) => {
-      child.props.onClick?.(e)
+      originalOnClick?.(e)
       context.onOpenChange(true)
     },
-  } as Partial<React.ComponentProps<typeof child.type>>)
+  })
 }
 
 const SheetContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { side?: 'left' | 'right' }>(

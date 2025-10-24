@@ -24,12 +24,14 @@ const DropdownMenuTrigger = ({ children, asChild }: { children: React.ReactNode;
   if (!context) throw new Error('DropdownMenuTrigger must be used within DropdownMenu')
 
   const child = React.Children.only(children) as React.ReactElement<{ onClick?: (e: React.MouseEvent) => void }>
+  const originalOnClick = child.props.onClick
+
   return React.cloneElement(child, {
     onClick: (e: React.MouseEvent) => {
-      child.props.onClick?.(e)
+      originalOnClick?.(e)
       context.setOpen(!context.open)
     },
-  } as Partial<React.ComponentProps<typeof child.type>>)
+  })
 }
 
 const DropdownMenuContent = ({ className, children, align = 'start' }: { className?: string; children: React.ReactNode; align?: 'start' | 'end' }) => {

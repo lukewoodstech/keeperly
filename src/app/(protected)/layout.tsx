@@ -10,12 +10,12 @@ export default async function ProtectedLayout({
 }) {
   const supabase = await createClient()
 
-  // Check authentication
+  // Check authentication - use getUser() for security
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session) {
+  if (!user) {
     redirect('/auth')
   }
 
@@ -23,7 +23,7 @@ export default async function ProtectedLayout({
   const { data: subscription } = await supabase
     .from('subscriptions')
     .select('status')
-    .eq('user_id', session.user.id)
+    .eq('user_id', user.id)
     .single()
 
   const hasPro = subscription?.status === 'active'
@@ -32,7 +32,7 @@ export default async function ProtectedLayout({
     <div className="flex h-screen overflow-hidden">
       <Sidebar hasPro={hasPro} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <TopBar email={session.user.email || ''} hasPro={hasPro} />
+        <TopBar email={user.email || ''} hasPro={hasPro} />
         <main className="flex-1 overflow-y-auto bg-background">
           <div className="container mx-auto p-4 md:p-6 lg:p-8">
             {children}

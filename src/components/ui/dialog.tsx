@@ -29,12 +29,14 @@ const DialogTrigger = ({ children, asChild }: { children: React.ReactNode; asChi
   if (!context) throw new Error('DialogTrigger must be used within Dialog')
 
   const child = React.Children.only(children) as React.ReactElement<{ onClick?: (e: React.MouseEvent) => void }>
+  const originalOnClick = child.props.onClick
+
   return React.cloneElement(child, {
     onClick: (e: React.MouseEvent) => {
-      child.props.onClick?.(e)
+      originalOnClick?.(e)
       context.onOpenChange(true)
     },
-  } as Partial<React.ComponentProps<typeof child.type>>)
+  })
 }
 
 const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(

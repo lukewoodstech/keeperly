@@ -6,12 +6,12 @@ import type { Animal } from '@/lib/types'
 export default async function AppPage() {
   const supabase = await createClient()
 
-  // Get current user session
+  // Get current user - use getUser() for security
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session) {
+  if (!user) {
     return null // Layout will redirect
   }
 
@@ -19,7 +19,7 @@ export default async function AppPage() {
   const { data: animals } = await supabase
     .from('animals')
     .select('*')
-    .eq('user_id', session.user.id)
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
   const animalList = (animals || []) as Animal[]
@@ -33,7 +33,7 @@ export default async function AppPage() {
             {animalList.length} {animalList.length === 1 ? 'animal' : 'animals'} in your collection
           </p>
         </div>
-        <AddAnimalDialogWrapper userId={session.user.id} />
+        <AddAnimalDialogWrapper userId={user.id} />
       </div>
 
       {animalList.length === 0 ? (
@@ -41,7 +41,7 @@ export default async function AppPage() {
           <p className="text-muted-foreground mb-4">
             You haven't added any animals yet.
           </p>
-          <AddAnimalDialogWrapper userId={session.user.id} />
+          <AddAnimalDialogWrapper userId={user.id} />
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
