@@ -1,12 +1,12 @@
 import { notFound } from 'next/navigation'
-import { ArrowLeft, Calendar, Droplet, Edit, Trash2 } from 'lucide-react'
+import { ArrowLeft, Calendar, Droplet } from 'lucide-react'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { QuickLogDialogWrapper } from '@/components/QuickLogDialogWrapper'
 import { EventTimeline } from '@/components/EventTimeline'
+import { AnimalActions } from '@/components/AnimalActions'
 import { createClient } from '@/lib/supabaseServer'
 import { fmtDate } from '@/lib/format'
 import type { Animal, Event } from '@/lib/types'
@@ -68,7 +68,7 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
               {animal.sex && (
                 <Badge
                   variant="secondary"
-                  className="bg-blue-100 text-blue-700 border-blue-200"
+                  className="bg-gray-100 text-gray-700 border-gray-200"
                 >
                   {animal.sex}
                 </Badge>
@@ -79,12 +79,7 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
 
           <div className="flex gap-2">
             <QuickLogDialogWrapper animalId={animal.id} userId={user.id} />
-            <Button variant="outline" size="icon" className="hover:bg-gray-100 border-gray-300">
-              <Edit className="h-4 w-4 text-gray-700" />
-            </Button>
-            <Button variant="outline" size="icon" className="hover:bg-red-50 border-gray-300 hover:border-red-300">
-              <Trash2 className="h-4 w-4 text-gray-700 hover:text-red-600" />
-            </Button>
+            <AnimalActions animal={animal as Animal} userId={user.id} />
           </div>
         </div>
       </div>
@@ -115,8 +110,8 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
                   <p className="text-sm font-medium text-gray-600">Acquired</p>
                   <p className="text-2xl font-bold text-gray-900 mt-2">{fmtDate(animal.acquisition_date)}</p>
                 </div>
-                <div className="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-green-600" />
+                <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <Calendar className="h-6 w-6 text-blue-600" />
                 </div>
               </div>
             </CardContent>
@@ -131,8 +126,8 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
                   <p className="text-sm font-medium text-gray-600">Morph</p>
                   <p className="text-2xl font-bold text-gray-900 mt-2">{animal.morph}</p>
                 </div>
-                <div className="w-12 h-12 rounded-lg bg-purple-50 flex items-center justify-center">
-                  <Droplet className="h-6 w-6 text-purple-600" />
+                <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <Droplet className="h-6 w-6 text-blue-600" />
                 </div>
               </div>
             </CardContent>
@@ -146,8 +141,8 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
                 <p className="text-sm font-medium text-gray-600">Total Events</p>
                 <p className="text-2xl font-bold text-gray-900 mt-2">{eventList.length}</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center">
-                <Calendar className="h-6 w-6 text-orange-600" />
+              <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center">
+                <Calendar className="h-6 w-6 text-blue-600" />
               </div>
             </div>
           </CardContent>

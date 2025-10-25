@@ -72,6 +72,65 @@ export async function createAnimal(
   }
 }
 
+export async function updateAnimal(
+  animalId: string,
+  formData: unknown,
+  userId: string
+): Promise<ActionResult> {
+  try {
+    const supabase = await createClient()
+
+    // Verify ownership
+    const { data: animal } = await supabase
+      .from('animals')
+      .select('user_id')
+      .eq('id', animalId)
+      .single()
+
+    if (!animal) {
+      return {
+        error: 'Animal not found',
+      }
+    }
+
+    if (animal.user_id !== userId) {
+      return {
+        error: 'You do not have permission to update this animal',
+      }
+    }
+
+    // Validate form data
+    const validatedData = animalSchema.parse(formData)
+
+    // Update animal
+    const { error: updateError } = await supabase
+      .from('animals')
+      .update(validatedData)
+      .eq('id', animalId)
+
+    if (updateError) {
+      return {
+        error: updateError.message,
+      }
+    }
+
+    // Revalidate the animals page and detail page
+    revalidatePath('/app')
+    revalidatePath(`/app/animal/${animalId}`)
+
+    return { ok: true }
+  } catch (error) {
+    if (error instanceof Error) {
+      return {
+        error: error.message,
+      }
+    }
+    return {
+      error: 'An unexpected error occurred',
+    }
+  }
+}
+
 export async function deleteAnimal(
   animalId: string,
   userId: string
