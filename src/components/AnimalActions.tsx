@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Edit, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { EditAnimalDialogWrapper } from './EditAnimalDialogWrapper'
+import { DeleteAnimalDialog } from './DeleteAnimalDialog'
 import type { Animal } from '@/lib/types'
 
 interface AnimalActionsProps {
@@ -13,6 +14,7 @@ interface AnimalActionsProps {
 
 export function AnimalActions({ animal, userId }: AnimalActionsProps) {
   const [editOpen, setEditOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
   return (
     <>
@@ -28,6 +30,7 @@ export function AnimalActions({ animal, userId }: AnimalActionsProps) {
         variant="outline"
         size="icon"
         className="hover:bg-red-50 border-gray-300 hover:border-red-300"
+        onClick={() => setDeleteOpen(true)}
       >
         <Trash2 className="h-4 w-4 text-gray-700 hover:text-red-600" />
       </Button>
@@ -37,6 +40,14 @@ export function AnimalActions({ animal, userId }: AnimalActionsProps) {
         userId={userId}
         isOpen={editOpen}
         onOpenChange={setEditOpen}
+      />
+
+      <DeleteAnimalDialog
+        animalId={animal.id}
+        animalName={animal.name}
+        userId={userId}
+        isOpen={deleteOpen}
+        onOpenChange={setDeleteOpen}
       />
     </>
   )
