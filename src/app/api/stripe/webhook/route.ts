@@ -71,9 +71,33 @@ export async function POST(request: Request) {
   }
 
   try {
+    console.log(`📨 Processing event: ${event.type} [${event.id}]`)
+
+    // Handle checkout.session.completed (MOST IMPORTANT for new subs)
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as Stripe.Checkout.Session
+      console.log('✅ Checkout completed:', session.id)
+
+      const userId = session.metadata?.userId
+
+      if (!userId) {
+        console.error('❌ No userId in checkout session metadata')
+        return NextResponse.json({ received: true })
+      }
+
+      // If there's a subscription, fetch it and update DB
+      if (session.subscription) {
+        const subscription = await stripe.subscriptions.retrieve(
+          session.subscription as string
+        )
+        await upsertSubscription(userId, subscription, event.id)
+      }
+    }
+
     // Handle customer.subscription.* events
     if (event.type.startsWith('customer.subscription.')) {
       const subscription = event.data.object as Stripe.Subscription
+      console.log(`🔄 Subscription event: ${subscription.id} - ${subscription.status}`)
 
       // Try to get userId from subscription metadata first
       let userId = subscription.metadata?.userId
@@ -107,47 +131,102 @@ export async function POST(request: Request) {
       }
 
       if (!userId) {
-        console.error('Could not determine userId for subscription')
+        console.error('❌ Could not determine userId for subscription')
         return NextResponse.json({ received: true })
       }
 
-      const status = mapStripeStatus(subscription.status)
+      await upsertSubscription(userId, subscription, event.id)
+    }
 
-      // Upsert subscription record
-      const { error } = await supabaseAdmin.from('subscriptions').upsert(
-        {
-          user_id: userId,
-          stripe_customer_id: subscription.customer as string,
-          stripe_subscription_id: subscription.id,
-          status,
-          current_period_start: new Date(
-            (subscription as any).current_period_start * 1000
-          ).toISOString(),
-          current_period_end: new Date(
-            (subscription as any).current_period_end * 1000
-          ).toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: 'user_id',
-        }
-      )
+    // Handle invoice.payment_succeeded
+    if (event.type === 'invoice.payment_succeeded') {
+      const invoice = event.data.object as Stripe.Invoice
+      console.log('💳 Invoice paid:', invoice.id)
 
-      if (error) {
-        console.error('Error upserting subscription:', error)
-        return NextResponse.json(
-          { error: 'Database error' },
-          { status: 500 }
+      // Refresh subscription data
+      if (invoice.subscription) {
+        const subscription = await stripe.subscriptions.retrieve(
+          invoice.subscription as string
         )
+        const userId = subscription.metadata?.userId
+        if (userId) {
+          await upsertSubscription(userId, subscription, event.id)
+        }
+      }
+    }
+
+    // Handle invoice.payment_failed
+    if (event.type === 'invoice.payment_failed') {
+      const invoice = event.data.object as Stripe.Invoice
+      console.log('❌ Invoice payment failed:', invoice.id)
+
+      // Update subscription to past_due
+      if (invoice.subscription) {
+        const subscription = await stripe.subscriptions.retrieve(
+          invoice.subscription as string
+        )
+        const userId = subscription.metadata?.userId
+        if (userId) {
+          await upsertSubscription(userId, subscription, event.id)
+        }
       }
     }
 
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('Webhook handler error:', error)
+    console.error('❌ Webhook handler error:', error)
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
+}
+
+// Helper function to upsert subscription (with cache invalidation)
+async function upsertSubscription(
+  userId: string,
+  subscription: Stripe.Subscription,
+  eventId: string
+) {
+  const status = mapStripeStatus(subscription.status)
+
+  console.log(`💾 Upserting subscription for user ${userId}:`, {
+    status,
+    subscriptionId: subscription.id,
+    eventId,
+  })
+
+  // Upsert subscription record
+  const { error } = await supabaseAdmin.from('subscriptions').upsert(
+    {
+      user_id: userId,
+      stripe_customer_id: subscription.customer as string,
+      stripe_subscription_id: subscription.id,
+      status,
+      current_period_start: new Date(
+        (subscription as any).current_period_start * 1000
+      ).toISOString(),
+      current_period_end: new Date(
+        (subscription as any).current_period_end * 1000
+      ).toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      onConflict: 'user_id',
+    }
+  )
+
+  if (error) {
+    console.error('❌ Error upserting subscription:', error)
+    throw error
+  }
+
+  console.log(`✅ Subscription upserted successfully for user ${userId}`)
+
+  // 🔥 CRITICAL: Revalidate Next.js cache
+  const { revalidatePath } = await import('next/cache')
+  revalidatePath('/app', 'layout')
+  revalidatePath('/account', 'layout')
+
+  console.log(`🔄 Cache revalidated for user ${userId}`)
 }

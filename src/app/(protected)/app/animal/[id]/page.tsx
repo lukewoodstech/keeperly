@@ -50,12 +50,12 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
   const eventList = (events || []) as Event[]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col gap-4">
         <Link
           href="/app"
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground w-fit"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 w-fit transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Animals
@@ -64,21 +64,26 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold">{animal.name}</h1>
+              <h1 className="text-3xl font-bold text-gray-900">{animal.name}</h1>
               {animal.sex && (
-                <Badge variant="secondary">{animal.sex}</Badge>
+                <Badge
+                  variant="secondary"
+                  className="bg-blue-100 text-blue-700 border-blue-200"
+                >
+                  {animal.sex}
+                </Badge>
               )}
             </div>
-            <p className="text-lg text-muted-foreground">{animal.species}</p>
+            <p className="text-lg text-gray-600">{animal.species}</p>
           </div>
 
           <div className="flex gap-2">
             <QuickLogDialogWrapper animalId={animal.id} userId={user.id} />
-            <Button variant="outline" size="icon">
-              <Edit className="h-4 w-4" />
+            <Button variant="outline" size="icon" className="hover:bg-gray-100 border-gray-300">
+              <Edit className="h-4 w-4 text-gray-700" />
             </Button>
-            <Button variant="outline" size="icon">
-              <Trash2 className="h-4 w-4" />
+            <Button variant="outline" size="icon" className="hover:bg-red-50 border-gray-300 hover:border-red-300">
+              <Trash2 className="h-4 w-4 text-gray-700 hover:text-red-600" />
             </Button>
           </div>
         </div>
@@ -87,57 +92,77 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {animal.dob && (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Date of Birth</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{fmtDate(animal.dob)}</div>
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-600">Date of Birth</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-2">{fmtDate(animal.dob)}</p>
+                </div>
+                <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <Calendar className="h-6 w-6 text-blue-600" />
+                </div>
+              </div>
             </CardContent>
           </Card>
         )}
 
         {animal.acquisition_date && (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Acquired</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{fmtDate(animal.acquisition_date)}</div>
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-600">Acquired</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-2">{fmtDate(animal.acquisition_date)}</p>
+                </div>
+                <div className="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center">
+                  <Calendar className="h-6 w-6 text-green-600" />
+                </div>
+              </div>
             </CardContent>
           </Card>
         )}
 
         {animal.morph && (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Morph</CardTitle>
-              <Droplet className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{animal.morph}</div>
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-600">Morph</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-2">{animal.morph}</p>
+                </div>
+                <div className="w-12 h-12 rounded-lg bg-purple-50 flex items-center justify-center">
+                  <Droplet className="h-6 w-6 text-purple-600" />
+                </div>
+              </div>
             </CardContent>
           </Card>
         )}
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Events</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{eventList.length}</div>
+        <Card className="hover:shadow-md transition-shadow">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-600">Total Events</p>
+                <p className="text-2xl font-bold text-gray-900 mt-2">{eventList.length}</p>
+              </div>
+              <div className="w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center">
+                <Calendar className="h-6 w-6 text-orange-600" />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="timeline" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="timeline">Timeline</TabsTrigger>
-          <TabsTrigger value="details">Details</TabsTrigger>
+      <Tabs defaultValue="timeline" className="space-y-6">
+        <TabsList className="bg-gray-100">
+          <TabsTrigger value="timeline" className="data-[state=active]:bg-white data-[state=active]:text-blue-700">
+            Timeline
+          </TabsTrigger>
+          <TabsTrigger value="details" className="data-[state=active]:bg-white data-[state=active]:text-blue-700">
+            Details
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="timeline" className="space-y-4">
@@ -145,32 +170,32 @@ export default async function AnimalDetailPage({ params }: AnimalDetailPageProps
         </TabsContent>
 
         <TabsContent value="details" className="space-y-4">
-          <Card>
+          <Card className="hover:shadow-md transition-shadow">
             <CardHeader>
-              <CardTitle>Animal Details</CardTitle>
+              <CardTitle className="text-gray-900">Animal Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid gap-3 text-sm">
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-muted-foreground">Species:</div>
-                  <div className="col-span-2 font-medium">{animal.species}</div>
+              <div className="grid gap-4 text-sm">
+                <div className="grid grid-cols-3 gap-4 p-3 rounded-lg bg-gray-50">
+                  <div className="text-gray-600 font-medium">Species:</div>
+                  <div className="col-span-2 font-semibold text-gray-900">{animal.species}</div>
                 </div>
                 {animal.breed && (
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-muted-foreground">Breed:</div>
-                    <div className="col-span-2 font-medium">{animal.breed}</div>
+                  <div className="grid grid-cols-3 gap-4 p-3 rounded-lg bg-gray-50">
+                    <div className="text-gray-600 font-medium">Breed:</div>
+                    <div className="col-span-2 font-semibold text-gray-900">{animal.breed}</div>
                   </div>
                 )}
                 {animal.sex && (
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-muted-foreground">Sex:</div>
-                    <div className="col-span-2 font-medium">{animal.sex}</div>
+                  <div className="grid grid-cols-3 gap-4 p-3 rounded-lg bg-gray-50">
+                    <div className="text-gray-600 font-medium">Sex:</div>
+                    <div className="col-span-2 font-semibold text-gray-900">{animal.sex}</div>
                   </div>
                 )}
                 {animal.notes && (
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-muted-foreground">Notes:</div>
-                    <div className="col-span-2 font-medium">{animal.notes}</div>
+                  <div className="grid grid-cols-3 gap-4 p-3 rounded-lg bg-gray-50">
+                    <div className="text-gray-600 font-medium">Notes:</div>
+                    <div className="col-span-2 font-semibold text-gray-900">{animal.notes}</div>
                   </div>
                 )}
               </div>

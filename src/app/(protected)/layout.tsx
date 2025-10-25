@@ -29,11 +29,11 @@ export default async function ProtectedLayout({
   const hasPro = subscription?.status === 'active'
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       <Sidebar hasPro={hasPro} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopBar email={user.email || ''} hasPro={hasPro} />
-        <main className="flex-1 overflow-y-auto bg-background">
+        <main className="flex-1 overflow-y-auto bg-gray-50">
           <div className="container mx-auto p-4 md:p-6 lg:p-8">
             {children}
           </div>

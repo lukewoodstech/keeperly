@@ -59,10 +59,16 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b">
-        <div className="container mx-auto px-4 h-16 flex items-center">
-          <Link href="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <header className="border-b border-gray-200 bg-white/80 backdrop-blur">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+              <span className="text-white font-bold text-sm">K</span>
+            </div>
+            <span className="text-lg font-bold text-gray-900">Keeperly</span>
+          </Link>
+          <Link href="/" className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors">
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Link>
@@ -70,26 +76,36 @@ export default function AuthPage() {
       </header>
 
       <main className="flex-1 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome to Keeperly</CardTitle>
-            <CardDescription>
+        <Card className="w-full max-w-md shadow-xl border-gray-200">
+          <CardHeader className="text-center space-y-3 pb-6">
+            <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-2xl">K</span>
+            </div>
+            <CardTitle className="text-2xl text-gray-900">Welcome to Keeperly</CardTitle>
+            <CardDescription className="text-gray-600">
               Sign in with your email to get started
             </CardDescription>
           </CardHeader>
           <CardContent>
             {submitted ? (
-              <Alert>
-                <Mail className="h-4 w-4" />
-                <AlertDescription>
-                  Check your email! We've sent you a magic link to sign in.
-                </AlertDescription>
+              <Alert className="bg-blue-50 border-blue-200">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <Mail className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-1">Check your email!</h4>
+                    <AlertDescription className="text-gray-700">
+                      We've sent you a magic link to sign in.
+                    </AlertDescription>
+                  </div>
+                </div>
               </Alert>
             ) : (
               <div className="space-y-4">
                 {error && (
-                  <Alert className="border-destructive">
-                    <AlertDescription className="text-destructive">
+                  <Alert className="bg-red-50 border-red-200">
+                    <AlertDescription className="text-red-700 font-medium">
                       {error}
                     </AlertDescription>
                   </Alert>
@@ -97,7 +113,7 @@ export default function AuthPage() {
 
                 <Button
                   onClick={handleGoogleSignIn}
-                  className="w-full"
+                  className="w-full border-gray-300 hover:bg-gray-50 hover:border-gray-400 shadow-sm"
                   variant="outline"
                   disabled={loading}
                 >
@@ -124,10 +140,10 @@ export default function AuthPage() {
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
+                    <span className="w-full border-t border-gray-200" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
+                    <span className="bg-white px-2 text-gray-500">
                       Or continue with email
                     </span>
                   </div>
@@ -135,7 +151,7 @@ export default function AuthPage() {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="email" className="text-gray-700">Email Address</Label>
                     <Input
                       id="email"
                       type="email"
@@ -144,9 +160,10 @@ export default function AuthPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       disabled={loading}
+                      className="border-gray-300"
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
+                  <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 shadow-md" disabled={loading}>
                     {loading ? (
                       'Sending...'
                     ) : (
@@ -156,7 +173,7 @@ export default function AuthPage() {
                       </>
                     )}
                   </Button>
-                  <p className="text-xs text-center text-muted-foreground">
+                  <p className="text-xs text-center text-gray-500">
                     We'll email you a magic link for a password-free sign in.
                   </p>
                 </form>

@@ -63,6 +63,12 @@ export async function POST(request: Request) {
       metadata: {
         userId,
       },
+      // 🔥 CRITICAL: Add metadata to subscription too!
+      subscription_data: {
+        metadata: {
+          userId,
+        },
+      },
     })
 
     return NextResponse.json({ url: session.url })

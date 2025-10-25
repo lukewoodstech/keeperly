@@ -59,15 +59,15 @@ export function QuickLogDialog({ animalId, onSubmit }: QuickLogDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button className="bg-blue-600 hover:bg-blue-700">
           <Plus className="h-4 w-4 mr-2" />
           Quick Log
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Log Event</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-gray-900">Log Event</DialogTitle>
+          <DialogDescription className="text-gray-600">
             Record an event for this animal
           </DialogDescription>
         </DialogHeader>
@@ -128,10 +128,10 @@ export function QuickLogDialog({ animalId, onSubmit }: QuickLogDialogProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-gray-300 hover:bg-gray-100">
               Cancel
             </Button>
-            <Button type="submit">Save Event</Button>
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">Save Event</Button>
           </DialogFooter>
         </form>
       </DialogContent>

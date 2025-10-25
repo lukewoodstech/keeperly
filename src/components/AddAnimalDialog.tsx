@@ -55,15 +55,15 @@ export function AddAnimalDialog({ onSubmit }: AddAnimalDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="lg">
+        <Button size="lg" className="bg-blue-600 hover:bg-blue-700 shadow-md">
           <Plus className="h-5 w-5 mr-2" />
           Add Animal
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Animal</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-gray-900">Add New Animal</DialogTitle>
+          <DialogDescription className="text-gray-600">
             Enter the details of your new animal
           </DialogDescription>
         </DialogHeader>
@@ -160,10 +160,10 @@ export function AddAnimalDialog({ onSubmit }: AddAnimalDialogProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-gray-300 hover:bg-gray-100">
               Cancel
             </Button>
-            <Button type="submit">Add Animal</Button>
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">Add Animal</Button>
           </DialogFooter>
         </form>
       </DialogContent>

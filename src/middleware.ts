@@ -34,8 +34,8 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // If user is signed in and trying to access auth page, redirect to /app
-  if (session && request.nextUrl.pathname === '/auth') {
+  // If user is signed in and trying to access auth page or root, redirect to /app
+  if (session && (request.nextUrl.pathname === '/auth' || request.nextUrl.pathname === '/')) {
     return NextResponse.redirect(new URL('/app', request.url))
   }
 
