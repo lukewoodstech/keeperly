@@ -140,14 +140,16 @@ export async function POST(request: Request) {
 
     // Handle invoice.payment_succeeded
     if (event.type === 'invoice.payment_succeeded') {
-      const invoice = event.data.object as Stripe.Invoice
+      const invoice = event.data.object as Stripe.Invoice & { subscription?: string | Stripe.Subscription }
       console.log('💳 Invoice paid:', invoice.id)
 
       // Refresh subscription data
-      if (invoice.subscription) {
-        const subscription = await stripe.subscriptions.retrieve(
-          invoice.subscription as string
-        )
+      const subscriptionId = typeof invoice.subscription === 'string'
+        ? invoice.subscription
+        : invoice.subscription?.id
+
+      if (subscriptionId) {
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
         const userId = subscription.metadata?.userId
         if (userId) {
           await upsertSubscription(userId, subscription, event.id)
@@ -157,14 +159,16 @@ export async function POST(request: Request) {
 
     // Handle invoice.payment_failed
     if (event.type === 'invoice.payment_failed') {
-      const invoice = event.data.object as Stripe.Invoice
+      const invoice = event.data.object as Stripe.Invoice & { subscription?: string | Stripe.Subscription }
       console.log('❌ Invoice payment failed:', invoice.id)
 
       // Update subscription to past_due
-      if (invoice.subscription) {
-        const subscription = await stripe.subscriptions.retrieve(
-          invoice.subscription as string
-        )
+      const subscriptionId = typeof invoice.subscription === 'string'
+        ? invoice.subscription
+        : invoice.subscription?.id
+
+      if (subscriptionId) {
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
         const userId = subscription.metadata?.userId
         if (userId) {
           await upsertSubscription(userId, subscription, event.id)
