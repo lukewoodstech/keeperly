@@ -56,17 +56,17 @@ export default async function AppPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2">
         <AddAnimalDialogWrapper userId={user.id} email={user.email || ''} />
         <Link href="/app/animals">
-          <Button variant="outline">
+          <Button variant="outline" className="border-gray-300 hover:bg-gray-50">
             <Scan className="h-4 w-4 mr-2" />
-            View All Animals
+            View All
           </Button>
         </Link>
-        <Button variant="outline" disabled className="opacity-50">
+        <Button variant="outline" disabled className="opacity-40 cursor-not-allowed border-gray-300">
           <Calendar className="h-4 w-4 mr-2" />
-          Schedule Task (Pro)
+          Tasks (Pro)
         </Button>
       </div>
 
@@ -85,38 +85,32 @@ export default async function AppPage() {
           actionHref={limitReached ? '/account' : undefined}
         />
 
-        <Card className="p-6 hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-600">Recent Activity</p>
-              <p className="text-3xl font-bold text-gray-900 mt-2">
-                {animalList.length > 0 ? '3' : '0'}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">Events logged this week</p>
-            </div>
-            <div className="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center">
-              <Calendar className="h-6 w-6 text-green-600" />
-            </div>
-          </div>
-        </Card>
+        <StatCard
+          title="Recent Activity"
+          value={animalList.length > 0 ? '3' : '0'}
+          icon={Calendar}
+          description="Events logged this week"
+        />
 
-        <Card className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <p className="text-sm font-medium text-purple-900">Pro Features</p>
-              <p className="text-2xl font-bold text-purple-900 mt-2">
-                {isProUser ? 'Active' : 'Locked'}
+        <Card className="p-5 border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                Pro Status
               </p>
-              <p className="text-xs text-purple-700 mt-1">
-                {isProUser ? 'Enjoying all features' : 'Upgrade to unlock'}
+              <p className="text-2xl font-semibold text-gray-900 mt-1.5">
+                {isProUser ? 'Active' : 'Free'}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                {isProUser ? 'All features unlocked' : 'Limited features'}
               </p>
             </div>
           </div>
           {!isProUser && (
-            <div className="mt-4 pt-4 border-t border-purple-200">
+            <div className="mt-4 pt-4 border-t border-gray-100">
               <Link href="/account">
-                <Button size="sm" className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
-                  Unlock Pro
+                <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                  Upgrade to Pro
                 </Button>
               </Link>
             </div>
@@ -126,18 +120,18 @@ export default async function AppPage() {
 
       {/* Limit Warning */}
       {limitReached && (
-        <Card className="p-4 bg-amber-50 border-amber-200">
+        <Card className="p-4 bg-yellow-50 border border-yellow-200 shadow-sm">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-yellow-700 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-amber-900">
+              <h3 className="text-sm font-semibold text-gray-900">
                 Animal Limit Reached
               </h3>
-              <p className="text-sm text-amber-700 mt-1">
-                You've added {freeLimit}/{freeLimit} animals on the free plan. Upgrade to Pro for unlimited animals and more features.
+              <p className="text-sm text-gray-600 mt-1">
+                You've added {freeLimit}/{freeLimit} animals on the free plan. Upgrade to Pro for unlimited animals.
               </p>
               <Link href="/account">
-                <Button size="sm" className="mt-3 bg-amber-600 hover:bg-amber-700">
+                <Button size="sm" className="mt-3 bg-blue-600 hover:bg-blue-700 text-white">
                   Upgrade to Pro
                 </Button>
               </Link>

@@ -2,9 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Scan, Dna, CheckSquare, FolderOpen, Settings, Sparkles } from 'lucide-react'
+import { LayoutDashboard, Scan, Dna, CheckSquare, FolderOpen, Settings, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ProBadge } from '@/components/ProBadge'
 import { cn } from '@/lib/utils'
 
 interface SidebarProps {
@@ -30,19 +29,19 @@ export function Sidebar({ hasPro = false }: SidebarProps) {
   ]
 
   return (
-    <aside className="hidden md:flex md:w-60 md:flex-col border-r bg-gray-50/50">
+    <aside className="hidden md:flex md:w-60 md:flex-col border-r border-gray-200 bg-white">
       {/* Logo */}
-      <div className="p-6 border-b">
+      <div className="p-6 border-b border-gray-200">
         <Link href="/app" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
             <span className="text-white font-bold text-sm">K</span>
           </div>
-          <h1 className="text-xl font-bold text-gray-900">Keeperly</h1>
+          <h1 className="text-lg font-semibold text-gray-900">Keeperly</h1>
         </Link>
       </div>
 
       {/* Main Navigation */}
-      <nav className="flex-1 p-3 space-y-1">
+      <nav className="flex-1 p-3 space-y-0.5">
         {mainLinks.map((link) => {
           const Icon = link.icon
           const isActive = pathname === link.href
@@ -51,20 +50,20 @@ export function Sidebar({ hasPro = false }: SidebarProps) {
               key={link.href}
               href={link.href}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
+                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-blue-50 text-blue-700 shadow-sm'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
               )}
             >
-              <Icon className="h-5 w-5 flex-shrink-0" />
+              <Icon className="h-4 w-4 flex-shrink-0" />
               <span className="flex-1">{link.label}</span>
             </Link>
           )
         })}
 
         {/* Pro Features */}
-        <div className="pt-4 border-t mt-4">
+        <div className="pt-3 mt-3 border-t border-gray-200 space-y-0.5">
           {proLinks.map((link) => {
             const Icon = link.icon
             const isActive = pathname === link.href
@@ -75,24 +74,24 @@ export function Sidebar({ hasPro = false }: SidebarProps) {
                 key={link.href}
                 href={isLocked ? '#' : link.href}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
-                  isLocked && 'opacity-60 cursor-not-allowed',
+                  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                  isLocked && 'opacity-50 cursor-not-allowed',
                   isActive && !isLocked
-                    ? 'bg-blue-50 text-blue-700 shadow-sm'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                 )}
                 onClick={(e) => isLocked && e.preventDefault()}
               >
-                <Icon className="h-5 w-5 flex-shrink-0" />
+                <Icon className="h-4 w-4 flex-shrink-0" />
                 <span className="flex-1">{link.label}</span>
-                {link.pro && !hasPro && <ProBadge variant="lock" />}
+                {link.pro && !hasPro && <Lock className="h-3 w-3 text-gray-400" />}
               </Link>
             )
           })}
         </div>
 
         {/* Bottom Links */}
-        <div className="pt-4 border-t mt-4">
+        <div className="pt-3 mt-3 border-t border-gray-200 space-y-0.5">
           {bottomLinks.map((link) => {
             const Icon = link.icon
             const isActive = pathname === link.href
@@ -101,13 +100,13 @@ export function Sidebar({ hasPro = false }: SidebarProps) {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
+                  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                   isActive
-                    ? 'bg-blue-50 text-blue-700 shadow-sm'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                 )}
               >
-                <Icon className="h-5 w-5 flex-shrink-0" />
+                <Icon className="h-4 w-4 flex-shrink-0" />
                 {link.label}
               </Link>
             )
@@ -117,13 +116,12 @@ export function Sidebar({ hasPro = false }: SidebarProps) {
 
       {/* Upgrade CTA */}
       {!hasPro && (
-        <div className="p-4 border-t">
+        <div className="p-4 border-t border-gray-200">
           <Link href="/account">
             <Button
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-md"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm"
               size="sm"
             >
-              <Sparkles className="h-4 w-4 mr-2" />
               Upgrade to Pro
             </Button>
           </Link>
@@ -132,10 +130,10 @@ export function Sidebar({ hasPro = false }: SidebarProps) {
 
       {/* Pro Badge */}
       {hasPro && (
-        <div className="p-4 border-t bg-gradient-to-r from-purple-50 to-pink-50">
-          <div className="flex items-center gap-2">
-            <ProBadge />
-            <span className="text-sm font-medium text-gray-700">Pro Member</span>
+        <div className="p-4 border-t border-gray-200">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="w-2 h-2 rounded-full bg-blue-600" />
+            <span className="font-medium">Pro</span>
           </div>
         </div>
       )}
