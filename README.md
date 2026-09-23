@@ -1,24 +1,29 @@
 # Keeperly
 
-A modern animal management platform for reptile and exotic pet breeders. Track your animals, log events, manage breeding records, and access advanced analytics.
+**Record keeping for reptile and exotic pet breeders.**
 
-## Tech Stack
+[Live app](https://keeperly-virid.vercel.app) · Next.js 16 · Supabase · Stripe
 
-- **Framework**: Next.js 16 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Database & Auth**: Supabase
-- **Payments**: Stripe
-- **Validation**: Zod
+<img width="1493" height="812" alt="keeperly" src="https://github.com/user-attachments/assets/29cd8d2d-7911-4db7-b497-1f1be6a1a166" />
 
-## Features
 
-- Magic link authentication
-- Animal management with rich details
-- Event logging (feeding, weight, medical, breeding, etc.)
-- Free tier with 5-animal limit
-- Pro subscription ($9.99/month) with unlimited animals
-- Mobile-first responsive design with dark mode
+## Why
+
+I keep tarantulas, and every keeper I know tracks feedings, sheds and weights in a notes app or a spreadsheet. Keeperly gives each animal a clean timeline so you can see its whole history at a glance.
+
+## What it does
+
+- **Animal profiles** for your whole collection
+- **Quick log** for feedings, weights, sheds, medical notes and breeding, with fields that change based on the event type
+- **Timeline** on every animal's page
+- **Magic link sign in**, no passwords
+- **Free and Pro plans** through Stripe. Free covers 5 animals, Pro is unlimited
+
+## Design decisions
+
+- **Logging takes seconds.** Quick log is one dialog, and each event type only asks for the fields it needs.
+- **Design tokens in code** (`src/lib/design-system.ts`) for color scales and the Pro treatment.
+- **Mobile first** since most logging happens standing next to an enclosure.
 
 ## Getting Started
 
@@ -30,10 +35,10 @@ npm install
 
 ### 2. Set Up Environment Variables
 
-Copy the example environment file:
+Create a `.env.local` file:
 
 ```bash
-cp .env.local.example .env.local
+touch .env.local
 ```
 
 Then populate the values (see setup instructions below).
